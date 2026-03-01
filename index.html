@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="윷 던지기">
+    <title>윷 던지기</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background: #F5EDE0;
+            color: #2C1810;
+            min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 32px 20px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 28px;
+        }
+
+        /* Result */
+        #result-area {
+            text-align: center;
+            margin-bottom: 20px;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #result-name {
+            font-size: 64px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        #result-desc {
+            font-size: 15px;
+            color: #8B7D6B;
+            margin-top: 6px;
+        }
+
+        #result-extra {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 14px;
+            background: #C41E3A;
+            color: white;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        #result-extra.show { opacity: 1; }
+
+        .clr-special { color: #C41E3A; }
+        .clr-normal { color: #2C1810; }
+        .clr-back { color: #4A6FA5; }
+        .clr-ready { color: #B0A090; }
+
+        @keyframes resultPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            60% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .result-pop { animation: resultPop 0.3s ease-out forwards; }
+
+        /* Sticks */
+        #sticks-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 32px;
+            min-height: 176px;
+            padding: 16px 8px;
+        }
+
+        .stick-wrapper { perspective: 600px; }
+
+        .stick-inner {
+            width: 42px;
+            height: 140px;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .stick-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 21px;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+        }
+
+        /* Flat side */
+        .stick-front {
+            background: linear-gradient(180deg, #F2E6CC 0%, #E6D4A8 30%, #DECB98 50%, #E6D4A8 70%, #F2E6CC 100%);
+            border: 2px solid #C8B078;
+        }
+
+        .stick-front .line {
+            width: 50%;
+            height: 2px;
+            background: #B89E60;
+            border-radius: 1px;
+        }
+
+        .stick-front .spacer { height: 16px; }
+
+        .stick-marked .stick-front .x-mark {
+            font-size: 17px;
+            font-weight: 900;
+            color: #A02020;
+            line-height: 1;
+            margin: 6px 0;
+        }
+
+        /* Round side */
+        .stick-back {
+            background: radial-gradient(ellipse 70% 100% at 50% 50%, #C8A048, #A07828 40%, #785818 80%, #604810 100%);
+            border: 2px solid #504010;
+            transform: rotateX(180deg);
+        }
+
+        /* Animations */
+        @keyframes throwToFlat {
+            0%   { transform: translateY(0) rotateX(0deg); }
+            15%  { transform: translateY(-70px) rotateX(360deg); }
+            35%  { transform: translateY(-45px) rotateX(720deg); }
+            55%  { transform: translateY(-15px) rotateX(1080deg); }
+            75%  { transform: translateY(-3px) rotateX(1440deg); }
+            90%  { transform: translateY(3px) rotateX(1440deg); }
+            100% { transform: translateY(0) rotateX(1440deg); }
+        }
+
+        @keyframes throwToRound {
+            0%   { transform: translateY(0) rotateX(0deg); }
+            15%  { transform: translateY(-70px) rotateX(360deg); }
+            35%  { transform: translateY(-45px) rotateX(720deg); }
+            55%  { transform: translateY(-15px) rotateX(1080deg); }
+            75%  { transform: translateY(-3px) rotateX(1620deg); }
+            90%  { transform: translateY(3px) rotateX(1620deg); }
+            100% { transform: translateY(0) rotateX(1620deg); }
+        }
+
+        .throw-flat {
+            animation: throwToFlat var(--dur, 0.85s) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .throw-round {
+            animation: throwToRound var(--dur, 0.85s) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        /* Button */
+        #throw-btn {
+            width: 100%;
+            max-width: 260px;
+            padding: 16px 32px;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: white;
+            background: #C41E3A;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+            box-shadow: 0 4px 14px rgba(196, 30, 58, 0.25);
+        }
+
+        #throw-btn:hover:not(:disabled) { background: #D42A48; }
+
+        #throw-btn:active:not(:disabled) {
+            transform: scale(0.96);
+            background: #A8182F;
+        }
+
+        #throw-btn:disabled {
+            background: #C0B0A0;
+            box-shadow: none;
+            cursor: default;
+        }
+
+        /* History */
+        #history-section {
+            width: 100%;
+            margin-top: 36px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .history-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #8B7D6B;
+        }
+
+        #clear-btn {
+            font-size: 13px;
+            color: #B0A090;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        #clear-btn:hover { color: #C41E3A; background: rgba(196,30,58,0.06); }
+
+        #history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            max-height: 280px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            padding: 9px 12px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .hist-num {
+            font-size: 12px;
+            color: #B0A090;
+            width: 28px;
+            flex-shrink: 0;
+        }
+
+        .hist-name {
+            font-size: 17px;
+            font-weight: 700;
+            width: 50px;
+            flex-shrink: 0;
+        }
+
+        .hist-desc {
+            font-size: 12px;
+            color: #A09080;
+            flex: 1;
+        }
+
+        .hist-sticks {
+            display: flex;
+            gap: 3px;
+            margin-left: 8px;
+        }
+
+        .mini-stick {
+            width: 8px;
+            height: 24px;
+            border-radius: 4px;
+        }
+
+        .mini-flat {
+            background: #EAD8AA;
+            border: 1px solid #C8B078;
+        }
+
+        .mini-round {
+            background: #906820;
+            border: 1px solid #604810;
+        }
+
+        .history-empty {
+            text-align: center;
+            color: #C0B0A0;
+            font-size: 14px;
+            padding: 24px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>윷 던지기</h1>
+
+        <div id="result-area" aria-live="polite">
+            <div id="result-name" class="clr-ready" style="font-size:36px">준비</div>
+            <div id="result-desc">버튼을 눌러 던져보세요</div>
+            <div id="result-extra">한 번 더!</div>
+        </div>
+
+        <div id="sticks-area"></div>
+
+        <button id="throw-btn" aria-label="윷 던지기">던지기</button>
+
+        <div id="history-section">
+            <div class="history-header">
+                <h3>기록</h3>
+                <button id="clear-btn" style="visibility:hidden">초기화</button>
+            </div>
+            <div id="history-list">
+                <div class="history-empty">아직 기록이 없습니다</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const FLAT_PROB = 0.4;
+        const ANIM_MS = 850;
+        const STAGGER_MS = 60;
+
+        let throwCount = 0;
+        let busy = false;
+        const hist = [];
+
+        const $ = function(id) { return document.getElementById(id); };
+        const sticksArea = $('sticks-area');
+        const resultName = $('result-name');
+        const resultDesc = $('result-desc');
+        const resultExtra = $('result-extra');
+        const throwBtn = $('throw-btn');
+        const historyList = $('history-list');
+        const clearBtn = $('clear-btn');
+
+        function el(tag, cls, text) {
+            var e = document.createElement(tag);
+            if (cls) e.className = cls;
+            if (text) e.textContent = text;
+            return e;
+        }
+
+        function initSticks() {
+            for (var i = 0; i < 4; i++) {
+                var wrapper = el('div', 'stick-wrapper');
+                var inner = el('div', 'stick-inner');
+                var front = el('div', 'stick-face stick-front');
+
+                if (i === 0) {
+                    wrapper.classList.add('stick-marked');
+                    front.appendChild(el('div', 'line'));
+                    front.appendChild(el('span', 'x-mark', 'X'));
+                    front.appendChild(el('div', 'line'));
+                } else {
+                    front.appendChild(el('div', 'line'));
+                    front.appendChild(el('div', 'spacer'));
+                    front.appendChild(el('div', 'line'));
+                }
+
+                var back = el('div', 'stick-face stick-back');
+
+                inner.append(front, back);
+                wrapper.appendChild(inner);
+                sticksArea.appendChild(wrapper);
+            }
+        }
+
+        function roll() {
+            var sticks = Array.from({ length: 4 }, function() {
+                return Math.random() < FLAT_PROB;
+            });
+            var flat = sticks.filter(Boolean).length;
+
+            var table = {
+                0: { name: '모', desc: '5칸 이동', extra: true, type: 'special' },
+                2: { name: '개', desc: '2칸 이동', extra: false, type: 'normal' },
+                3: { name: '걸', desc: '3칸 이동', extra: false, type: 'normal' },
+                4: { name: '윷', desc: '4칸 이동', extra: true, type: 'special' },
+            };
+
+            if (flat === 1) {
+                return {
+                    sticks: sticks,
+                    result: sticks[0]
+                        ? { name: '빽도', desc: '1칸 후퇴', extra: false, type: 'back' }
+                        : { name: '도', desc: '1칸 이동', extra: false, type: 'normal' },
+                };
+            }
+
+            return { sticks: sticks, result: table[flat] };
+        }
+
+        function doThrow() {
+            if (busy) return;
+            busy = true;
+            throwBtn.disabled = true;
+
+            var data = roll();
+            var sticks = data.sticks;
+            var result = data.result;
+            throwCount++;
+
+            var inners = sticksArea.querySelectorAll('.stick-inner');
+            var wrappers = sticksArea.querySelectorAll('.stick-wrapper');
+
+            wrappers.forEach(function(w) {
+                w.style.transition = 'none';
+                w.style.transform = '';
+            });
+
+            inners.forEach(function(e) {
+                e.className = 'stick-inner';
+                void e.offsetHeight;
+            });
+
+            resultName.textContent = '';
+            resultName.className = '';
+            resultDesc.textContent = '';
+            resultExtra.classList.remove('show');
+
+            requestAnimationFrame(function() {
+                inners.forEach(function(e, i) {
+                    e.style.setProperty('--dur', (800 + Math.random() * 150) + 'ms');
+                    setTimeout(function() {
+                        e.classList.add(sticks[i] ? 'throw-flat' : 'throw-round');
+                    }, i * STAGGER_MS);
+                });
+
+                var finishAt = ANIM_MS + 3 * STAGGER_MS + 50;
+
+                setTimeout(function() {
+                    wrappers.forEach(function(w) {
+                        w.style.transition = 'transform 0.4s ease-out';
+                        var r = (Math.random() - 0.5) * 14;
+                        var x = (Math.random() - 0.5) * 10;
+                        var y = (Math.random() - 0.5) * 6;
+                        w.style.transform = 'rotate(' + r + 'deg) translate(' + x + 'px, ' + y + 'px)';
+                    });
+
+                    var colors = { special: 'clr-special', back: 'clr-back', normal: 'clr-normal' };
+                    resultName.textContent = result.name;
+                    resultName.style.fontSize = '64px';
+                    resultName.className = colors[result.type] + ' result-pop';
+                    resultDesc.textContent = result.desc;
+
+                    if (result.extra) resultExtra.classList.add('show');
+
+                    if (navigator.vibrate) {
+                        navigator.vibrate(result.extra ? [40, 20, 40] : 25);
+                    }
+
+                    pushHistory(sticks, result);
+
+                    busy = false;
+                    throwBtn.disabled = false;
+                }, finishAt);
+            });
+        }
+
+        function pushHistory(sticks, result) {
+            hist.unshift({ sticks: sticks, result: result, num: throwCount });
+            renderHistory();
+        }
+
+        function renderHistory() {
+            historyList.textContent = '';
+
+            if (!hist.length) {
+                historyList.appendChild(el('div', 'history-empty', '아직 기록이 없습니다'));
+                clearBtn.style.visibility = 'hidden';
+                return;
+            }
+
+            clearBtn.style.visibility = 'visible';
+            var colors = { special: 'clr-special', back: 'clr-back', normal: '' };
+
+            hist.slice(0, 30).forEach(function(h) {
+                var item = el('div', 'history-item');
+
+                item.appendChild(el('span', 'hist-num', String(h.num)));
+
+                var nameEl = el('span', 'hist-name', h.result.name);
+                if (colors[h.result.type]) nameEl.classList.add(colors[h.result.type]);
+                item.appendChild(nameEl);
+
+                item.appendChild(el('span', 'hist-desc', h.result.desc));
+
+                var sticksDiv = el('div', 'hist-sticks');
+                h.sticks.forEach(function(f) {
+                    sticksDiv.appendChild(el('div', 'mini-stick ' + (f ? 'mini-flat' : 'mini-round')));
+                });
+                item.appendChild(sticksDiv);
+
+                historyList.appendChild(item);
+            });
+        }
+
+        function clearAll() {
+            hist.length = 0;
+            throwCount = 0;
+            renderHistory();
+        }
+
+        throwBtn.addEventListener('click', doThrow);
+        clearBtn.addEventListener('click', clearAll);
+
+        document.addEventListener('keydown', function(e) {
+            if ((e.code === 'Space' || e.code === 'Enter') && document.activeElement === document.body) {
+                e.preventDefault();
+                doThrow();
+            }
+        });
+
+        initSticks();
+    </script>
+</body>
+</html>
