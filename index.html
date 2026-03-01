@@ -31,6 +31,32 @@
             align-items: center;
         }
 
+        /* Navigation */
+        .mode-nav {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            background: rgba(0, 0, 0, 0.06);
+            border-radius: 10px;
+            padding: 3px;
+        }
+
+        .mode-nav a {
+            padding: 8px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #8B7D6B;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+
+        .mode-nav .nav-active {
+            background: white;
+            color: #2C1810;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
         h1 {
             font-size: 26px;
             font-weight: 800;
@@ -311,6 +337,11 @@
 </head>
 <body>
     <div class="container">
+        <nav class="mode-nav">
+            <a href="index.html" class="nav-active">윷</a>
+            <a href="dice.html">주사위</a>
+        </nav>
+
         <h1>윷 던지기</h1>
 
         <div id="result-area" aria-live="polite">

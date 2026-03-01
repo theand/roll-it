@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="주사위 던지기">
+    <title>주사위 던지기</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background: #F5EDE0;
+            color: #2C1810;
+            min-height: 100dvh;
+            display: flex;
+            justify-content: center;
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            padding: 32px 20px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Navigation */
+        .mode-nav {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 24px;
+            background: rgba(0, 0, 0, 0.06);
+            border-radius: 10px;
+            padding: 3px;
+        }
+
+        .mode-nav a {
+            padding: 8px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #8B7D6B;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+
+        .mode-nav .nav-active {
+            background: white;
+            color: #2C1810;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 28px;
+        }
+
+        /* Result */
+        #result-area {
+            text-align: center;
+            margin-bottom: 20px;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #result-name {
+            font-size: 56px;
+            font-weight: 900;
+            line-height: 1;
+            color: #2C1810;
+        }
+
+        #result-desc {
+            font-size: 15px;
+            color: #8B7D6B;
+            margin-top: 6px;
+        }
+
+        .clr-ready { color: #B0A090 !important; }
+        .clr-double { color: #C41E3A !important; }
+
+        @keyframes resultPop {
+            0% { transform: scale(0.5); opacity: 0; }
+            60% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .result-pop { animation: resultPop 0.3s ease-out forwards; }
+
+        #result-extra {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 4px 14px;
+            background: #C41E3A;
+            color: white;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        #result-extra.show { opacity: 1; }
+
+        /* Dice area */
+        #dice-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 24px;
+            min-height: 120px;
+            padding: 16px 8px;
+        }
+
+        .die {
+            width: 84px;
+            height: 84px;
+            background: white;
+            border-radius: 14px;
+            display: grid;
+            grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+            padding: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+            transition: box-shadow 0.2s;
+        }
+
+        .die-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dot {
+            width: 14px;
+            height: 14px;
+            background: #2C1810;
+            border-radius: 50%;
+        }
+
+        .die.hidden { display: none; }
+
+        @keyframes diceShake {
+            0%   { transform: translate(0, 0) rotate(0deg); }
+            10%  { transform: translate(-6px, -12px) rotate(-12deg); }
+            20%  { transform: translate(8px, -24px) rotate(10deg); }
+            30%  { transform: translate(-4px, -32px) rotate(-8deg); }
+            40%  { transform: translate(6px, -26px) rotate(14deg); }
+            50%  { transform: translate(-8px, -18px) rotate(-10deg); }
+            60%  { transform: translate(4px, -10px) rotate(6deg); }
+            70%  { transform: translate(-3px, -4px) rotate(-4deg); }
+            80%  { transform: translate(2px, -1px) rotate(2deg); }
+            90%  { transform: translate(-1px, 0) rotate(-1deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        .die.shaking {
+            animation: diceShake 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        /* Dice count toggle */
+        #count-toggle {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 28px;
+            background: rgba(0, 0, 0, 0.06);
+            border-radius: 10px;
+            padding: 3px;
+        }
+
+        .toggle-btn {
+            padding: 7px 20px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: #8B7D6B;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .toggle-btn.active {
+            background: white;
+            color: #2C1810;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Button */
+        #roll-btn {
+            width: 100%;
+            max-width: 260px;
+            padding: 16px 32px;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: white;
+            background: #C41E3A;
+            border: none;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s;
+            box-shadow: 0 4px 14px rgba(196, 30, 58, 0.25);
+        }
+
+        #roll-btn:hover:not(:disabled) { background: #D42A48; }
+
+        #roll-btn:active:not(:disabled) {
+            transform: scale(0.96);
+            background: #A8182F;
+        }
+
+        #roll-btn:disabled {
+            background: #C0B0A0;
+            box-shadow: none;
+            cursor: default;
+        }
+
+        /* History */
+        #history-section {
+            width: 100%;
+            margin-top: 36px;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .history-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #8B7D6B;
+        }
+
+        #clear-btn {
+            font-size: 13px;
+            color: #B0A090;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        #clear-btn:hover { color: #C41E3A; background: rgba(196, 30, 58, 0.06); }
+
+        #history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            max-height: 280px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            padding: 9px 12px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+
+        .hist-num {
+            font-size: 12px;
+            color: #B0A090;
+            width: 28px;
+            flex-shrink: 0;
+        }
+
+        .hist-values {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .mini-die {
+            width: 26px;
+            height: 26px;
+            background: white;
+            border: 1.5px solid #D0C8B8;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: #2C1810;
+        }
+
+        .hist-plus {
+            font-size: 12px;
+            color: #B0A090;
+        }
+
+        .hist-sum {
+            margin-left: auto;
+            font-size: 15px;
+            font-weight: 700;
+            color: #2C1810;
+        }
+
+        .hist-sum.clr-double { color: #C41E3A; }
+
+        .history-empty {
+            text-align: center;
+            color: #C0B0A0;
+            font-size: 14px;
+            padding: 24px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="mode-nav">
+            <a href="index.html">윷</a>
+            <a href="dice.html" class="nav-active">주사위</a>
+        </nav>
+
+        <h1>주사위 던지기</h1>
+
+        <div id="result-area" aria-live="polite">
+            <div id="result-name" class="clr-ready" style="font-size:36px">준비</div>
+            <div id="result-desc">버튼을 눌러 던져보세요</div>
+            <div id="result-extra">더블!</div>
+        </div>
+
+        <div id="dice-area">
+            <div class="die" id="die-0"></div>
+            <div class="die hidden" id="die-1"></div>
+        </div>
+
+        <div id="count-toggle">
+            <button class="toggle-btn active" data-count="1">1개</button>
+            <button class="toggle-btn" data-count="2">2개</button>
+        </div>
+
+        <button id="roll-btn" aria-label="주사위 던지기">던지기</button>
+
+        <div id="history-section">
+            <div class="history-header">
+                <h3>기록</h3>
+                <button id="clear-btn" style="visibility:hidden">초기화</button>
+            </div>
+            <div id="history-list">
+                <div class="history-empty">아직 기록이 없습니다</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var diceCount = 1;
+        var rollCount = 0;
+        var busy = false;
+        var hist = [];
+
+        var ANIM_MS = 700;
+        var CYCLE_MS = 60;
+
+        var DOT_MAP = {
+            1: [5],
+            2: [3, 7],
+            3: [3, 5, 7],
+            4: [1, 3, 7, 9],
+            5: [1, 3, 5, 7, 9],
+            6: [1, 3, 4, 6, 7, 9]
+        };
+
+        var $ = function(id) { return document.getElementById(id); };
+        var resultName = $('result-name');
+        var resultDesc = $('result-desc');
+        var resultExtra = $('result-extra');
+        var rollBtn = $('roll-btn');
+        var historyList = $('history-list');
+        var clearBtn = $('clear-btn');
+        var dieEls = [$('die-0'), $('die-1')];
+        var toggleBtns = document.querySelectorAll('.toggle-btn');
+
+        function mk(tag, cls, text) {
+            var e = document.createElement(tag);
+            if (cls) e.className = cls;
+            if (text !== undefined) e.textContent = String(text);
+            return e;
+        }
+
+        function renderDie(container, value) {
+            container.textContent = '';
+            var positions = DOT_MAP[value] || [];
+            for (var i = 1; i <= 9; i++) {
+                var cell = mk('div', 'die-cell');
+                if (positions.indexOf(i) !== -1) {
+                    cell.appendChild(mk('div', 'dot'));
+                }
+                container.appendChild(cell);
+            }
+        }
+
+        function randomFace() {
+            return Math.floor(Math.random() * 6) + 1;
+        }
+
+        function initDice() {
+            renderDie(dieEls[0], 1);
+            renderDie(dieEls[1], 1);
+        }
+
+        function setDiceCount(n) {
+            diceCount = n;
+            toggleBtns.forEach(function(btn) {
+                btn.classList.toggle('active', Number(btn.dataset.count) === n);
+            });
+            dieEls[1].classList.toggle('hidden', n === 1);
+        }
+
+        function doRoll() {
+            if (busy) return;
+            busy = true;
+            rollBtn.disabled = true;
+
+            var values = [];
+            for (var i = 0; i < diceCount; i++) {
+                values.push(randomFace());
+            }
+            rollCount++;
+
+            resultName.textContent = '';
+            resultName.className = '';
+            resultDesc.textContent = '';
+            resultExtra.classList.remove('show');
+
+            // Start shake animation
+            for (var i = 0; i < diceCount; i++) {
+                dieEls[i].classList.remove('shaking');
+                void dieEls[i].offsetHeight;
+                dieEls[i].classList.add('shaking');
+            }
+
+            // Cycle random faces during animation
+            var cycleTimer = setInterval(function() {
+                for (var i = 0; i < diceCount; i++) {
+                    renderDie(dieEls[i], randomFace());
+                }
+            }, CYCLE_MS);
+
+            setTimeout(function() {
+                clearInterval(cycleTimer);
+
+                // Show final values
+                for (var i = 0; i < diceCount; i++) {
+                    renderDie(dieEls[i], values[i]);
+                    dieEls[i].classList.remove('shaking');
+                }
+
+                var sum = values.reduce(function(a, b) { return a + b; }, 0);
+                var isDouble = diceCount === 2 && values[0] === values[1];
+
+                if (diceCount === 1) {
+                    resultName.textContent = String(values[0]);
+                    resultName.style.fontSize = '56px';
+                    resultName.className = 'result-pop';
+                    resultDesc.textContent = '';
+                } else {
+                    resultName.textContent = String(sum);
+                    resultName.style.fontSize = '56px';
+                    resultName.className = 'result-pop' + (isDouble ? ' clr-double' : '');
+                    resultDesc.textContent = values[0] + ' + ' + values[1];
+                    if (isDouble) resultExtra.classList.add('show');
+                }
+
+                if (navigator.vibrate) {
+                    navigator.vibrate(isDouble ? [40, 20, 40] : 25);
+                }
+
+                pushHistory(values, sum, isDouble);
+
+                busy = false;
+                rollBtn.disabled = false;
+            }, ANIM_MS);
+        }
+
+        function pushHistory(values, sum, isDouble) {
+            hist.unshift({ values: values, sum: sum, isDouble: isDouble, num: rollCount });
+            renderHistory();
+        }
+
+        function renderHistory() {
+            historyList.textContent = '';
+
+            if (!hist.length) {
+                historyList.appendChild(mk('div', 'history-empty', '아직 기록이 없습니다'));
+                clearBtn.style.visibility = 'hidden';
+                return;
+            }
+
+            clearBtn.style.visibility = 'visible';
+
+            hist.slice(0, 30).forEach(function(h) {
+                var item = mk('div', 'history-item');
+
+                item.appendChild(mk('span', 'hist-num', h.num));
+
+                var valuesDiv = mk('div', 'hist-values');
+                h.values.forEach(function(v, i) {
+                    if (i > 0) valuesDiv.appendChild(mk('span', 'hist-plus', '+'));
+                    valuesDiv.appendChild(mk('span', 'mini-die', v));
+                });
+                item.appendChild(valuesDiv);
+
+                var sumCls = 'hist-sum' + (h.isDouble ? ' clr-double' : '');
+                if (h.values.length > 1) {
+                    item.appendChild(mk('span', sumCls, '= ' + h.sum));
+                }
+
+                historyList.appendChild(item);
+            });
+        }
+
+        function clearAll() {
+            hist.length = 0;
+            rollCount = 0;
+            renderHistory();
+        }
+
+        // Events
+        rollBtn.addEventListener('click', doRoll);
+        clearBtn.addEventListener('click', clearAll);
+
+        toggleBtns.forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                if (!busy) setDiceCount(Number(btn.dataset.count));
+            });
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if ((e.code === 'Space' || e.code === 'Enter') && document.activeElement === document.body) {
+                e.preventDefault();
+                doRoll();
+            }
+        });
+
+        initDice();
+    </script>
+</body>
+</html>
