@@ -331,6 +331,7 @@
         <nav class="mode-nav">
             <a href="index.html">윷</a>
             <a href="dice.html" class="nav-active">주사위</a>
+            <a href="dice-3d/">3D</a>
         </nav>
 
         <h1>주사위 던지기</h1>
@@ -347,16 +348,16 @@
         </div>
 
         <div id="count-toggle">
-            <button class="toggle-btn active" data-count="1">1개</button>
-            <button class="toggle-btn" data-count="2">2개</button>
+            <button type="button" class="toggle-btn active" data-count="1">1개</button>
+            <button type="button" class="toggle-btn" data-count="2">2개</button>
         </div>
 
-        <button id="roll-btn" aria-label="주사위 던지기">던지기</button>
+        <button type="button" id="roll-btn" aria-label="주사위 던지기">던지기</button>
 
         <div id="history-section">
             <div class="history-header">
                 <h3>기록</h3>
-                <button id="clear-btn" style="visibility:hidden">초기화</button>
+                <button type="button" id="clear-btn" style="visibility:hidden">초기화</button>
             </div>
             <div id="history-list">
                 <div class="history-empty">아직 기록이 없습니다</div>
@@ -401,9 +402,9 @@
 
         function renderDie(container, value) {
             container.textContent = '';
-            var positions = DOT_MAP[value] || [];
-            for (var i = 1; i <= 9; i++) {
-                var cell = mk('div', 'die-cell');
+            const positions = DOT_MAP[value] || [];
+            for (let i = 1; i <= 9; i++) {
+                const cell = mk('div', 'die-cell');
                 if (positions.indexOf(i) !== -1) {
                     cell.appendChild(mk('div', 'dot'));
                 }
@@ -433,8 +434,8 @@
             busy = true;
             rollBtn.disabled = true;
 
-            var values = [];
-            for (var i = 0; i < diceCount; i++) {
+            const values = [];
+            for (let i = 0; i < diceCount; i++) {
                 values.push(randomFace());
             }
             rollCount++;
@@ -445,7 +446,7 @@
             resultExtra.classList.remove('show');
 
             // Start shake animation
-            for (var i = 0; i < diceCount; i++) {
+            for (let i = 0; i < diceCount; i++) {
                 dieEls[i].classList.remove('shaking');
                 void dieEls[i].offsetHeight;
                 dieEls[i].classList.add('shaking');
@@ -453,7 +454,7 @@
 
             // Cycle random faces during animation
             var cycleTimer = setInterval(function() {
-                for (var i = 0; i < diceCount; i++) {
+                for (let i = 0; i < diceCount; i++) {
                     renderDie(dieEls[i], randomFace());
                 }
             }, CYCLE_MS);
@@ -462,7 +463,7 @@
                 clearInterval(cycleTimer);
 
                 // Show final values
-                for (var i = 0; i < diceCount; i++) {
+                for (let i = 0; i < diceCount; i++) {
                     renderDie(dieEls[i], values[i]);
                     dieEls[i].classList.remove('shaking');
                 }

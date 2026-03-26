@@ -340,6 +340,7 @@
         <nav class="mode-nav">
             <a href="index.html" class="nav-active">윷</a>
             <a href="dice.html">주사위</a>
+            <a href="dice-3d/">3D</a>
         </nav>
 
         <h1>윷 던지기</h1>
@@ -352,12 +353,12 @@
 
         <div id="sticks-area"></div>
 
-        <button id="throw-btn" aria-label="윷 던지기">던지기</button>
+        <button type="button" id="throw-btn" aria-label="윷 던지기">던지기</button>
 
         <div id="history-section">
             <div class="history-header">
                 <h3>기록</h3>
-                <button id="clear-btn" style="visibility:hidden">초기화</button>
+                <button type="button" id="clear-btn" style="visibility:hidden">초기화</button>
             </div>
             <div id="history-list">
                 <div class="history-empty">아직 기록이 없습니다</div>
@@ -391,10 +392,10 @@
         }
 
         function initSticks() {
-            for (var i = 0; i < 4; i++) {
-                var wrapper = el('div', 'stick-wrapper');
-                var inner = el('div', 'stick-inner');
-                var front = el('div', 'stick-face stick-front');
+            for (let i = 0; i < 4; i++) {
+                const wrapper = el('div', 'stick-wrapper');
+                const inner = el('div', 'stick-inner');
+                const front = el('div', 'stick-face stick-front');
 
                 if (i === 0) {
                     wrapper.classList.add('stick-marked');
@@ -407,7 +408,7 @@
                     front.appendChild(el('div', 'line'));
                 }
 
-                var back = el('div', 'stick-face stick-back');
+                const back = el('div', 'stick-face stick-back');
 
                 inner.append(front, back);
                 wrapper.appendChild(inner);
