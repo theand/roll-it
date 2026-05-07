@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Dice } from './dice.js';
 
+// --- WebGL check ---
 const canvas = document.getElementById('dice-canvas');
 const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
 if (!gl) {
@@ -8,15 +9,19 @@ if (!gl) {
   throw new Error('WebGL not supported');
 }
 
+// --- Renderer ---
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
+// --- Scene ---
 const scene = new THREE.Scene();
 
+// --- Camera ---
 const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
 camera.position.set(0, 0, 18);
 
+// --- Lighting ---
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
 scene.add(ambientLight);
 
@@ -28,6 +33,7 @@ const pointLight2 = new THREE.PointLight(0xffffff, 1.0, 80);
 pointLight2.position.set(8, -4, 10);
 scene.add(pointLight2);
 
+// --- Dice Management ---
 const POSITIONS = {
   1: [new THREE.Vector3(0, 0, 0)],
   2: [new THREE.Vector3(-3, 0, 0), new THREE.Vector3(3, 0, 0)],
@@ -62,8 +68,10 @@ function setDiceSides(sides) {
   rebuildDice();
 }
 
+// Initialize with 1 die
 setDiceCount(1);
 
+// --- UI: Dice count buttons ---
 const countButtons = document.querySelectorAll('.count-btn');
 countButtons.forEach(btn => {
   btn.addEventListener('click', () => {
@@ -94,6 +102,7 @@ sidesButtons.forEach(btn => {
   });
 });
 
+// --- UI: Roll button ---
 const rollBtn = document.getElementById('roll-btn');
 rollBtn.addEventListener('click', async () => {
   if (isRolling) return;
@@ -107,6 +116,7 @@ rollBtn.addEventListener('click', async () => {
   rollBtn.disabled = false;
 });
 
+// --- Animation Loop ---
 const clock = new THREE.Clock();
 
 function animate() {
@@ -122,6 +132,7 @@ function animate() {
 
 animate();
 
+// --- Resize ---
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();

@@ -116,6 +116,7 @@ export class Dice {
     this._resultTexture = null;
     this.resultSprite = null;
 
+    // Scratch objects reused per-frame to avoid GC pressure
     this._scratchNormal = new THREE.Vector3();
     this._scratchQuat = new THREE.Quaternion();
     this._scratchQuat2 = new THREE.Quaternion();
