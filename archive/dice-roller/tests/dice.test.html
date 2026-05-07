@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>Dice Tests</title>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js"
+    }
+  }
+  </script>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #1a1a2e; color: #fff; }
+    .pass { color: #4caf50; }
+    .fail { color: #f44336; }
+    #results { white-space: pre-line; }
+  </style>
+</head>
+<body>
+  <h2>Dice Tests</h2>
+  <div id="results"></div>
+  <script type="module">
+    import * as THREE from 'three';
+    import { Dice } from '../js/dice.js';
+
+    const results = document.getElementById('results');
+    let passed = 0;
+    let failed = 0;
+
+    function assert(condition, name) {
+      if (condition) {
+        results.innerHTML += `<span class="pass">${'\u2713'} ${name}</span>\n`;
+        passed++;
+      } else {
+        results.innerHTML += `<span class="fail">${'\u2717'} ${name}</span>\n`;
+        failed++;
+      }
+    }
+
+    // Setup
+    const scene = new THREE.Scene();
+
+    // Test: Dice 생성
+    const defaultDice = new Dice(scene, new THREE.Vector3(0, 0, 0));
+    assert(defaultDice.mesh instanceof THREE.Mesh, 'Dice.mesh is a THREE.Mesh');
+    assert(defaultDice.sides === 20, 'Default dice sides are 20');
+    assert(scene.children.includes(defaultDice.mesh), 'Default mesh added to scene');
+    assert(defaultDice.faceLabelGroup.children.length === 20, 'D20 has 20 visible face labels');
+
+    const cubeDice = new Dice(scene, new THREE.Vector3(4, 0, 0), 6);
+    assert(cubeDice.sides === 6, 'D6 dice sides are 6');
+    assert(scene.children.includes(cubeDice.mesh), 'D6 mesh added to scene');
+    assert(cubeDice.faceLabelGroup.children.length === 6, 'D6 has 6 visible face labels');
+
+    // Helper: drive update() until roll resolves
+    function completeRoll(dice) {
+      return new Promise((resolve) => {
+        const promise = dice.roll();
+        const interval = setInterval(() => {
+          dice.update(0.1);
+          if (!dice.rolling && !dice.settling) {
+            clearInterval(interval);
+            promise.then(resolve);
+          }
+        }, 0);
+      });
+    }
+
+    function hasFlatContact(dice) {
+      const down = new THREE.Vector3(0, -1, 0);
+      return dice._faceData.some((face) => {
+        const worldNormal = face.normal.clone().applyQuaternion(dice.mesh.quaternion);
+        return worldNormal.dot(down) > 0.999;
+      });
+    }
+
+    // Test: 결과 범위
+    const d20Results = [];
+    for (let i = 0; i < 20; i++) {
+      const r = await completeRoll(defaultDice);
+      d20Results.push(r);
+    }
+    const allD20InRange = d20Results.every(r => r >= 1 && r <= 20 && Number.isInteger(r));
+    assert(allD20InRange, 'D20 roll results are integers in [1, 20]');
+
+    const d20UniqueValues = new Set(d20Results);
+    assert(d20UniqueValues.size > 1, 'D20 roll produces varied results');
+    assert(hasFlatContact(defaultDice), 'D20 stops with a flat face touching floor');
+
+    const d6Results = [];
+    for (let i = 0; i < 20; i++) {
+      const r = await completeRoll(cubeDice);
+      d6Results.push(r);
+    }
+    const allD6InRange = d6Results.every(r => r >= 1 && r <= 6 && Number.isInteger(r));
+    assert(allD6InRange, 'D6 roll results are integers in [1, 6]');
+
+    const d6UniqueValues = new Set(d6Results);
+    assert(d6UniqueValues.size > 1, 'D6 roll produces varied results');
+    assert(hasFlatContact(cubeDice), 'D6 stops with a flat face touching floor');
+
+    // Test: dispose
+    defaultDice.dispose();
+    cubeDice.dispose();
+    assert(!scene.children.includes(defaultDice.mesh), 'D20 mesh removed from scene after dispose');
+    assert(!scene.children.includes(cubeDice.mesh), 'D6 mesh removed from scene after dispose');
+
+    // Summary
+    results.innerHTML += `\n--- ${passed} passed, ${failed} failed ---\n`;
+  </script>
+</body>
+</html>
