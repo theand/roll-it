@@ -1,4 +1,4 @@
-<!-- Parent: ../AGENTS.md -->
+<!-- Parent: ../../../AGENTS.md -->
 
 # specs
 

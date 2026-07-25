@@ -15,6 +15,7 @@
 ## For AI Agents
 
 ### Working In This Directory
+- `dice.js`는 `dice-3d/js/dice.js`와 바이트 동일 사본 — 한쪽만 고치면 갈라진다
 - ES Module 형식 (`import * as THREE from 'three'`), importmap으로 Three.js 해석
 - `Dice` 클래스는 `scene` 참조를 생성자에서 받아 메시를 직접 추가/제거
 - 면 데이터(`_faceData`)는 지오메트리 삼각형을 법선 기준으로 클러스터링하여 추출

@@ -1,5 +1,9 @@
 # Cosmic Dice Roller
 
+> **아카이브됨** — `dice-3d/`로 통합된 원본 standalone 프로젝트(`afb4bf8`, `ceb4041`).
+> 라이브 코드는 `../../dice-3d/`이고, 여기서 계속 쓰이는 것은 `tests/dice.test.html`뿐이다.
+> `js/dice.js`가 `dice-3d/js/dice.js`와 동일 사본이라 이 테스트가 3D 주사위 로직의 유일한 검증 수단이다.
+
 ## Purpose
 D6/D8/D12/D20 3D 주사위를 최대 4개까지 동시에 굴릴 수 있는 코스믹 테마 웹앱. Three.js + 바닐라 JS, 빌드 도구 없이 CDN import map으로 구성.
 
@@ -24,7 +28,7 @@ npx serve -l 3460 .
 | `css/` | 코스믹 그라디언트 테마 스타일시트 (see `css/AGENTS.md`) |
 | `js/` | 핵심 로직 — Dice 클래스와 Three.js 씬 관리 (see `js/AGENTS.md`) |
 | `tests/` | 브라우저 기반 테스트 (see `tests/AGENTS.md`) |
-| `docs/` | 설계 문서 및 구현 계획 (see `docs/AGENTS.md`) |
+| `docs/superpowers/` | 최초 구현 계획(`plans/`)과 디자인 스펙(`specs/`) 보관 — 코드와 동기화되지 않는 읽기 전용 참고자료 (see `docs/superpowers/specs/AGENTS.md`) |
 
 ## For AI Agents
 

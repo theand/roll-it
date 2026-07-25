@@ -14,6 +14,7 @@
 ## For AI Agents
 
 ### Working In This Directory
+- `dice-3d/css/style.css`는 이 파일에 `.mode-nav` 블록이 추가된 버전 — 그대로 덮어쓰면 nav가 사라진다
 - `#webgl-error`는 `display: none`이 기본이고, `:not([hidden])` 셀렉터로 `display: flex`를 활성화 — HTML `hidden` 속성과 CSS `display: flex` 충돌 방지 패턴
 - 컨트롤 버튼(`.count-btn`, `.sides-btn`)은 `.active` 클래스로 선택 상태 표시
 - Three.js 캔버스(`#dice-canvas`)는 `position: absolute`로 전체 화면 차지

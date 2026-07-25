@@ -20,6 +20,7 @@
 - `completeRoll()` 헬퍼: `setInterval`로 `dice.update(0.1)`을 반복 호출하여 애니메이션 완료까지 구동
 
 ### Testing Requirements
+- `dice-3d/`에는 테스트가 없어, 이 파일이 3D 주사위 로직의 유일한 회귀 검증 수단이다
 - 새 Dice 기능 추가 시 이 파일에 테스트 케이스 추가
 - 모든 테스트가 pass한 뒤에만 커밋
 
