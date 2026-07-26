@@ -34,6 +34,6 @@
 - `../js/dice.js` — 테스트 대상 `Dice` 클래스
 
 ### External
-- Three.js v0.170.0 (CDN importmap)
+- Three.js v0.185.1 (CDN importmap)
 
 <!-- MANUAL: Any manually added notes below this line are preserved on regeneration -->

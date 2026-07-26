@@ -34,7 +34,7 @@ npx serve -l 3460 .
 
 ### Working In This Directory
 - 빌드 도구 없음 — `npx serve -l 3460 .` 로 로컬 서버 실행 (SPA 모드 `-s` 사용 금지)
-- Three.js v0.170.0을 CDN importmap으로 로드하므로 패키지 매니저 불필요
+- Three.js v0.185.1을 CDN importmap으로 로드하므로 패키지 매니저 불필요
 - ES Module 기반이라 `file://` 프로토콜에서 테스트 불가, 반드시 HTTP 서버 사용
 
 ### Testing Requirements
@@ -52,6 +52,6 @@ npx serve -l 3460 .
 ## Dependencies
 
 ### External
-- Three.js v0.170.0 (CDN: `https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js`)
+- Three.js v0.185.1 (CDN: `https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js`)
 
 <!-- MANUAL: Any manually added notes below this line are preserved on regeneration -->

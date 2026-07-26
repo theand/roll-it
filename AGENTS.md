@@ -45,10 +45,11 @@ npx serve -l 3461 archive/dice-roller
 - `dice-3d/js/dice.js`는 `archive/dice-roller/js/dice.js`와 바이트 단위로 동일한 사본이다. 한쪽만 고치면 아카이브 테스트가 검증하는 대상과 갈라진다 — 고칠 때 사본 관계를 유지할지 먼저 정하고, 유지하지 않기로 했다면 커밋 메시지에 그 결정을 남긴다.
 - `dice-3d/`에는 테스트가 없다. 3D 주사위 로직 회귀 검증은 `archive/dice-roller/tests/dice.test.html`이 유일한 수단이다.
 - CSS는 이미 갈라져 있다 — `dice-3d/css/style.css`는 아카이브 원본에 `.mode-nav` 블록이 추가된 버전이라, 아카이브 CSS로 덮어쓰면 nav가 사라진다.
+- 애니메이션 루프는 `THREE.Timer` 를 쓴다 — `THREE.Clock` 은 r181 부터 deprecated 라 콘솔 경고가 뜬다. `Timer` 는 `update()` 를 먼저 호출한 뒤 `getDelta()` 를 읽어야 한다. 탭 백그라운드 복귀 시의 큰 delta 가 물리를 튀게 하면 `timer.connect(document)` 로 Page Visibility 보호를 켤 수 있다(현재는 미적용 — `Clock` 과 동일 거동).
 - 윷 판정: 평면 개수 0=모, 1=도, 2=개, 3=걸, 4=윷. 빽도는 `X` 표시된 첫 윷가락(`index.html`의 `i === 0`)만 평면일 때다. 평면 확률은 `FLAT_PROB = 0.4`.
 
 ## Code Conventions
 
-- 프레임워크·빌드 도구·패키지 매니저를 도입하지 않는다. 외부 의존성은 CDN importmap의 Three.js v0.170.0 하나뿐이다.
+- 프레임워크·빌드 도구·패키지 매니저를 도입하지 않는다. 외부 의존성은 CDN importmap의 Three.js v0.185.1 하나뿐이다.
 - 커밋 메시지는 한글, 접두사 `feat:`/`fix:`/`refactor:`/`docs:`/`chore:`. 구조 변경과 기능 변경을 같은 커밋에 섞지 않는다.
 - UI 텍스트는 한국어, 모바일 우선(`user-scalable=no`, `100dvh`, `apple-mobile-web-app-*` 메타, `navigator.vibrate` 햅틱).

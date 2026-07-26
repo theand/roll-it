@@ -38,6 +38,6 @@
 - `../index.html` — `<script type="module" src="js/main.js">` 로 로드
 
 ### External
-- Three.js v0.170.0 — `THREE.Mesh`, `THREE.MeshPhysicalMaterial`, `THREE.IcosahedronGeometry`, `THREE.BoxGeometry`, `THREE.OctahedronGeometry`, `THREE.DodecahedronGeometry`, `THREE.CanvasTexture`, `THREE.Sprite`
+- Three.js v0.185.1 — `THREE.Mesh`, `THREE.MeshPhysicalMaterial`, `THREE.IcosahedronGeometry`, `THREE.BoxGeometry`, `THREE.OctahedronGeometry`, `THREE.DodecahedronGeometry`, `THREE.CanvasTexture`, `THREE.Sprite`
 
 <!-- MANUAL: Any manually added notes below this line are preserved on regeneration -->
