@@ -119,11 +119,12 @@ rollBtn.addEventListener('click', async () => {
 });
 
 // --- Animation Loop ---
-const clock = new THREE.Clock();
+const timer = new THREE.Timer();
 
 function animate() {
   requestAnimationFrame(animate);
-  const delta = clock.getDelta();
+  timer.update();
+  const delta = timer.getDelta();
 
   diceArray.forEach((d) => {
     d.update(delta);
