@@ -19,7 +19,9 @@ npx serve -l 3460 .
 
 # dice-3d/js/dice.js 를 고쳤으면 아카이브의 브라우저 테스트로 검증
 npx serve -l 3461 archive/dice-roller
-#   http://localhost:3461/tests/dice.test.html
+#   http://localhost:3461/tests/dice.test   (루트 서버면 /archive/dice-roller/tests/dice.test)
+#   40회 굴림이라 30초 이상 걸린다. `--- 15 passed, 0 failed ---` 요약줄이 나올 때까지
+#   기다려라 — 중간에 읽으면 7/15만 보여 실패처럼 읽힌다.
 ```
 
 ## Key Files
@@ -45,6 +47,8 @@ npx serve -l 3461 archive/dice-roller
 - `dice-3d/js/dice.js`는 `archive/dice-roller/js/dice.js`와 바이트 단위로 동일한 사본이다. 한쪽만 고치면 아카이브 테스트가 검증하는 대상과 갈라진다 — 고칠 때 사본 관계를 유지할지 먼저 정하고, 유지하지 않기로 했다면 커밋 메시지에 그 결정을 남긴다.
 - `dice-3d/`에는 테스트가 없다. 3D 주사위 로직 회귀 검증은 `archive/dice-roller/tests/dice.test.html`이 유일한 수단이다.
 - CSS는 이미 갈라져 있다 — `dice-3d/css/style.css`는 아카이브 원본에 `.mode-nav` 블록이 추가된 버전이라, 아카이브 CSS로 덮어쓰면 nav가 사라진다.
+- 렌더는 로드마다 비결정적이다 — `dice.js:76` 의 `_colorOffset`(면-색 배치)과 `dice.js:94-97` 의 초기 회전이 랜덤이다. **스크린샷 A/B 비교로 시각 회귀를 판정할 수 없다.** 15개 assertion 도 개수·범위·면접촉·dispose 만 보고 외형과 라벨 값은 검사하지 않는다.
+- 헤드리스로 3D 를 검증하려면 소프트웨어 WebGL 이 필요하다 — Chrome 에 `--headless=new --enable-unsafe-swiftshader --use-angle=swiftshader`. 루프가 살아있는지는 ROLL 후 `#roll-btn` 이 다시 활성화되는지로 본다: delta 가 0이면 `roll()` 의 Promise 가 resolve 되지 않아 영구 disabled 로 남는다.
 - 애니메이션 루프는 `THREE.Timer` 를 쓴다 — `THREE.Clock` 은 r181 부터 deprecated 라 콘솔 경고가 뜬다. `Timer` 는 `update()` 를 먼저 호출한 뒤 `getDelta()` 를 읽어야 한다. 탭 백그라운드 복귀 시의 큰 delta 가 물리를 튀게 하면 `timer.connect(document)` 로 Page Visibility 보호를 켤 수 있다(현재는 미적용 — `Clock` 과 동일 거동).
 - 윷 판정: 평면 개수 0=모, 1=도, 2=개, 3=걸, 4=윷. 빽도는 `X` 표시된 첫 윷가락(`index.html`의 `i === 0`)만 평면일 때다. 평면 확률은 `FLAT_PROB = 0.4`.
 
