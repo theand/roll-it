@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-08T16:44:21.144434+00:00",
+  "title": "Design System: roll-it",
+  "extensions": {
+    "shadows": [
+      {
+        "name": "action",
+        "value": "0 5px 12px #947b6340",
+        "purpose": "실행 버튼의 기본 깊이."
+      },
+      {
+        "name": "action-pressed",
+        "value": "0 2px 5px #947b632e",
+        "purpose": "눌린 실행 버튼."
+      }
+    ],
+    "motion": [
+      {
+        "name": "action-transition",
+        "value": "background .18s,transform .18s,box-shadow .18s",
+        "purpose": "실행 버튼 상태 전환."
+      },
+      {
+        "name": "result-pop",
+        "value": ".35s cubic-bezier(.16,1,.3,1)",
+        "purpose": "결과 등장."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "mobile",
+        "value": "760px"
+      },
+      {
+        "name": "tablet-upper",
+        "value": "950px"
+      },
+      {
+        "name": "compact-mobile-height",
+        "value": "800px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "던지기",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "전체 너비의 주 실행 버튼.",
+      "html": "<button class=\"ds-primary\">던지기 →</button>",
+      "css": ".ds-primary {min-height:60px;\n    width:100%;\n    display:flex;\n    align-items:center;\n    justify-content:center;\n    gap:12px;\n    border:0;\n    border-radius:12px;\n    background:var(--accent,#ffc49d);\n    color:#47301d;\n    font-size:19px;\n    font-weight:800;\n    box-shadow:0 5px 12px #947b6340;\n    transition:background .18s,transform .18s,box-shadow .18s;}.ds-primary {font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;cursor:pointer;}.ds-primary:hover:not(:disabled) {background:#ffd5b8;}.ds-primary:active:not(:disabled) {transform:translateY(4px);\n    box-shadow:0 2px 5px #947b632e;}.ds-primary:disabled {cursor:wait;\n    opacity:.55;}.ds-primary:focus-visible,.ds-clear:focus-visible,.ds-nav a:focus-visible,.ds-choice:focus-visible {outline:3px solid #bb4e27;outline-offset:5px;}@media(prefers-reduced-motion:reduce){.ds-primary{transition:none;}}"
+    },
+    {
+      "name": "기록 삭제",
+      "kind": "button",
+      "refersTo": "button-clear",
+      "description": "기록 영역의 보조 동작.",
+      "html": "<button class=\"ds-clear\">기록 지우기</button>",
+      "css": ".ds-clear {min-height:44px;\n    padding:8px 0 8px 12px;\n    border:0;\n    background:transparent;\n    color:var(--muted,#546e68);\n    font-size:13px;}.ds-clear {font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;cursor:pointer;}.ds-clear:hover {color:#9b3e16;}.ds-primary:focus-visible,.ds-clear:focus-visible,.ds-nav a:focus-visible,.ds-choice:focus-visible {outline:3px solid #bb4e27;outline-offset:5px;}"
+    },
+    {
+      "name": "모드 탐색",
+      "kind": "nav",
+      "refersTo": "navigation",
+      "description": "세 모드의 현재 위치를 표시한다.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"모드\"><a class=\"ds-current\" href=\"#\" aria-current=\"page\">윷</a><a href=\"#\">2D 주사위</a><a href=\"#\">3D 주사위</a></nav>",
+      "css": ".ds-nav {display:flex;\n    gap:4px;\n    padding:5px;\n    background:#dbe6df;\n    border-radius:12px;}.ds-nav {font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;}.ds-nav a {min-height:44px;\n    display:flex;\n    align-items:center;\n    justify-content:center;\n    padding:0 20px;\n    border-radius:8px;\n    text-decoration:none;\n    color:#385b52;\n    font-size:14px;\n    font-weight:650;}.ds-nav .ds-current {background:var(--ink,#183f3a);\n    color:var(--white,#fffef7);}.ds-nav a:hover:not(.ds-current) {background:#ccdcd2;}.ds-primary:focus-visible,.ds-clear:focus-visible,.ds-nav a:focus-visible,.ds-choice:focus-visible {outline:3px solid #bb4e27;outline-offset:5px;}"
+    },
+    {
+      "name": "주사위 개수 선택",
+      "kind": "button",
+      "refersTo": "choice-selected",
+      "description": "그룹 안에서 선택 상태를 표시한다.",
+      "html": "<div class=\"ds-choices\"><button class=\"ds-choice ds-selected\" aria-pressed=\"true\">1개</button><button class=\"ds-choice\" aria-pressed=\"false\">2개</button></div>",
+      "css": ".ds-choices {display:flex;\n    gap:5px;\n    background:#dbe6df;\n    padding:4px;\n    border-radius:10px;}.ds-choice {min-width:44px;\n    min-height:44px;\n    padding:8px 13px;\n    border:0;\n    border-radius:7px;\n    background:transparent;\n    color:var(--ink,#183f3a);\n    font-size:14px;\n    font-weight:650;}.ds-choice {font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;cursor:pointer;}.ds-choice.ds-selected {background:var(--ink,#183f3a);\n    color:var(--white,#fffef7);}.ds-primary:focus-visible,.ds-clear:focus-visible,.ds-nav a:focus-visible,.ds-choice:focus-visible {outline:3px solid #bb4e27;outline-offset:5px;}"
+    },
+    {
+      "name": "놀이 공간",
+      "kind": "custom",
+      "refersTo": "play-field",
+      "description": "결과와 놀이 물체를 담는 청록색 영역.",
+      "html": "<section class=\"ds-field\"><div class=\"ds-result\">던져볼까요?</div><p class=\"ds-caption\">윷가락 4개를 던져요</p></section>",
+      "css": ".ds-field {position:relative;\n    background:var(--table,#18594f);\n    border-radius:16px;\n    min-height:470px;\n    overflow:hidden;\n    color:var(--white,#fffef7);\n    display:flex;\n    flex-direction:column;\n    align-items:center;\n    padding:32px 20px 24px;}.ds-field {font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;}.ds-field::after {content:'';\n    position:absolute;\n    inset:14px;\n    border:1px solid #508477;\n    border-radius:9px;\n    pointer-events:none;}.ds-result {font-size:64px;\n    font-weight:800;\n    line-height:1.08;\n    letter-spacing:-.04em;\n    color:var(--white,#fffef7);}.ds-caption {color:#d1e6db;\n    font-size:12px;\n    position:relative;\n    z-index:1;\n    line-height:1.6;\n    text-align:center;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "청록색 놀이 공간",
+    "overview": "옅은 민트 바탕에 청록색 놀이 공간을 놓고 크림색 윷·주사위와 결과를 드러낸다.\n살구색 실행 버튼은 놀이 공간 바로 아래에 둔다. 소개보다 던지기와 결과 읽기를 우선한다.",
+    "keyCharacteristics": [
+      "세 모드에서 같은 탐색·실행·기록 표현을 사용한다.",
+      "시스템 한글 글꼴과 큰 결과 숫자로 빠르게 읽힌다.",
+      "물체의 회전·착지와 짧은 결과 등장에 움직임을 집중한다."
+    ],
+    "rules": [],
+    "dos": [
+      "Do 세 모드의 공통 탐색·실행·기록 스타일을 함께 유지한다.",
+      "Do 작은 화면에서 실행 버튼과 결과를 먼저 읽을 수 있게 한다.",
+      "Do 터치 영역, 키보드 포커스, reduced-motion을 유지한다."
+    ],
+    "donts": [
+      "Don't 결과를 색상만으로 구별한다.",
+      "Don't 사용자 확대를 막거나 폰트·프레임워크 의존성을 추가한다.",
+      "Don't 놀이 물체를 대체하는 장식 이미지를 추가한다."
+    ]
+  }
+}
