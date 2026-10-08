@@ -1,0 +1,40 @@
+diff --git a/AGENTS.md b/AGENTS.md
+index 04a80f6..62ddf91 100644
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -42,6 +42,7 @@ npx serve -l 3461 archive/dice-roller
+ ## Gotchas
+ 
+ - `dice-3d/`는 ES module + importmap이라 `file://`로 열면 CORS로 죽는다. HTTP 서버 필수이고, `npx serve`에 SPA 플래그(`-s`)를 붙이면 하위 경로가 깨진다.
++- importmap 은 `"three"` 키 하나만 매핑한다. 애드온(`three/addons/…`, 벤더 스킬 예시의 `three/examples/jsm/…`)을 쓰려면 같은 버전으로 `"three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/"` 키를 추가하고 `three/addons/…` 로 import 한다.
+ - `serve`는 `.html` 확장자를 벗겨 301 리다이렉트한다(`/dice.html` → `/dice`). 브라우저는 따라가므로 nav 링크(`href="dice.html"`)는 정상 동작하지만, 스크립트·테스트에서 URL을 때릴 때는 리다이렉트를 따라가게(`curl -L`) 해야 한다.
+ - `dice-3d/` nav 링크가 `../index.html`이라 **`dice-3d/` 안에서 서버를 띄우면 모드 전환이 404**다. 항상 repo 루트를 서버 루트로 둔다.
+ - `dice-3d/js/dice.js`는 `archive/dice-roller/js/dice.js`와 바이트 단위로 동일한 사본이다. 한쪽만 고치면 아카이브 테스트가 검증하는 대상과 갈라진다 — 고칠 때 사본 관계를 유지할지 먼저 정하고, 유지하지 않기로 했다면 커밋 메시지에 그 결정을 남긴다.
+@@ -49,11 +50,12 @@ npx serve -l 3461 archive/dice-roller
+ - CSS는 이미 갈라져 있다 — `dice-3d/css/style.css`는 아카이브 원본에 `.mode-nav` 블록이 추가된 버전이라, 아카이브 CSS로 덮어쓰면 nav가 사라진다.
+ - 렌더는 로드마다 비결정적이다 — `dice.js:76` 의 `_colorOffset`(면-색 배치)과 `dice.js:94-97` 의 초기 회전이 랜덤이다. **스크린샷 A/B 비교로 시각 회귀를 판정할 수 없다.** 15개 assertion 도 개수·범위·면접촉·dispose 만 보고 외형과 라벨 값은 검사하지 않는다.
+ - 헤드리스로 3D 를 검증하려면 소프트웨어 WebGL 이 필요하다 — Chrome 에 `--headless=new --enable-unsafe-swiftshader --use-angle=swiftshader`. 루프가 살아있는지는 ROLL 후 `#roll-btn` 이 다시 활성화되는지로 본다: delta 가 0이면 `roll()` 의 Promise 가 resolve 되지 않아 영구 disabled 로 남는다.
+-- 애니메이션 루프는 `THREE.Timer` 를 쓴다 — `THREE.Clock` 은 r181 부터 deprecated 라 콘솔 경고가 뜬다. `Timer` 는 `update()` 를 먼저 호출한 뒤 `getDelta()` 를 읽어야 한다. 탭 백그라운드 복귀 시의 큰 delta 가 물리를 튀게 하면 `timer.connect(document)` 로 Page Visibility 보호를 켤 수 있다(현재는 미적용 — `Clock` 과 동일 거동).
++- 애니메이션 루프는 `THREE.Timer` 를 쓴다 — `THREE.Clock` 은 r181 부터 deprecated 라 콘솔 경고가 뜬다. `Timer` 는 `update()` 를 먼저 호출한 뒤 `getDelta()` 를 읽어야 한다. 탭 백그라운드 복귀 시의 큰 delta 가 물리를 튀게 하면 `timer.connect(document)` 로 Page Visibility 보호를 켤 수 있다(현재는 미적용 — 복귀 직후의 큰 delta 가 clamp 없이 그대로 `Dice.update()` 로 들어간다).
++- `RGBELoader` 는 r180 부터 deprecated(콘솔 경고) — HDR 환경맵은 `HDRLoader` 를 쓴다. 벤더 스킬 `threejs-materials` 의 예시는 아직 `RGBELoader` 라 그대로 옮기지 않는다.
+ - 윷 판정: 평면 개수 0=모, 1=도, 2=개, 3=걸, 4=윷. 빽도는 `X` 표시된 첫 윷가락(`index.html`의 `i === 0`)만 평면일 때다. 평면 확률은 `FLAT_PROB = 0.4`.
+ 
+ ## Code Conventions
+ 
+ - 프레임워크·빌드 도구·패키지 매니저를 도입하지 않는다. 외부 의존성은 CDN importmap의 Three.js v0.185.1 하나뿐이다.
+-- 커밋 메시지는 한글, 접두사 `feat:`/`fix:`/`refactor:`/`docs:`/`chore:`. 구조 변경과 기능 변경을 같은 커밋에 섞지 않는다.
++- 커밋 메시지는 한글, 접두사 `feat:`/`fix:`/`refactor:`/`docs:`/`build:`/`chore:`. 구조 변경과 기능 변경을 같은 커밋에 섞지 않는다.
+ - UI 텍스트는 한국어, 모바일 우선(`user-scalable=no`, `100dvh`, `apple-mobile-web-app-*` 메타, `navigator.vibrate` 햅틱).
+diff --git a/archive/dice-roller/AGENTS.md b/archive/dice-roller/AGENTS.md
+index 2591eea..119f211 100644
+--- a/archive/dice-roller/AGENTS.md
++++ b/archive/dice-roller/AGENTS.md
+@@ -45,8 +45,6 @@ npx serve -l 3460 .
+ - Dice 클래스는 면당 개별 material group 사용 (면 수만큼 머터리얼 배열)
+ 
+ ### Code Conventions
+-- 구조적 변경(refactor)과 기능 변경(feat/fix) 분리 커밋
+-- 커밋 접두사: feat: / fix: / refactor: / docs:
+ - TDD 우선 (테스트 먼저 → 구현 → 리팩터)
+ 
+ ## Dependencies

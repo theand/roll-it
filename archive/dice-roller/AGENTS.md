@@ -45,8 +45,6 @@ npx serve -l 3460 .
 - Dice 클래스는 면당 개별 material group 사용 (면 수만큼 머터리얼 배열)
 
 ### Code Conventions
-- 구조적 변경(refactor)과 기능 변경(feat/fix) 분리 커밋
-- 커밋 접두사: feat: / fix: / refactor: / docs:
 - TDD 우선 (테스트 먼저 → 구현 → 리팩터)
 
 ## Dependencies
