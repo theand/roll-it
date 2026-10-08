@@ -20,7 +20,7 @@
 - Three.js 캔버스(`#dice-canvas`)는 `position: absolute`로 전체 화면 차지
 
 ### Testing Requirements
-- 브라우저에서 `index.html` 열어 레이아웃 확인
+- 로컬 서버(`npx serve -l 3460 .`)로 `index.html` 을 열어 레이아웃 확인 — `file://` 은 JS 모듈이 죽어 캔버스·에러 오버레이가 안 뜬다
 - 480px 이하 뷰포트에서 반응형 동작 확인
 
 ### Common Patterns
