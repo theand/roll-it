@@ -1,379 +1,756 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="윷 던지기">
-    <title>윷 던지기</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-            background: #F5EDE0;
-            color: #2C1810;
-            min-height: 100dvh;
-            display: flex;
-            justify-content: center;
-            -webkit-user-select: none;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 400px;
-            padding: 32px 20px 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        /* Navigation */
-        .mode-nav {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 24px;
-            background: rgba(0, 0, 0, 0.06);
-            border-radius: 10px;
-            padding: 3px;
-        }
-
-        .mode-nav a {
-            padding: 8px 24px;
-            border-radius: 8px;
-            text-decoration: none;
-            color: #8B7D6B;
-            font-weight: 600;
-            font-size: 15px;
-            transition: all 0.2s;
-        }
-
-        .mode-nav .nav-active {
-            background: white;
-            color: #2C1810;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            font-size: 26px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            margin-bottom: 28px;
-        }
-
-        /* Result */
-        #result-area {
-            text-align: center;
-            margin-bottom: 20px;
-            min-height: 100px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #result-name {
-            font-size: 64px;
-            font-weight: 900;
-            line-height: 1;
-        }
-
-        #result-desc {
-            font-size: 15px;
-            color: #8B7D6B;
-            margin-top: 6px;
-        }
-
-        #result-extra {
-            display: inline-block;
-            margin-top: 8px;
-            padding: 4px 14px;
-            background: #C41E3A;
-            color: white;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 700;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        #result-extra.show { opacity: 1; }
-
-        .clr-special { color: #C41E3A; }
-        .clr-normal { color: #2C1810; }
-        .clr-back { color: #4A6FA5; }
-        .clr-ready { color: #B0A090; }
-
-        @keyframes resultPop {
-            0% { transform: scale(0.5); opacity: 0; }
-            60% { transform: scale(1.1); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .result-pop { animation: resultPop 0.3s ease-out forwards; }
-
-        /* Sticks */
-        #sticks-area {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 32px;
-            min-height: 176px;
-            padding: 16px 8px;
-        }
-
-        .stick-wrapper { perspective: 600px; }
-
-        .stick-inner {
-            width: 42px;
-            height: 140px;
-            position: relative;
-            transform-style: preserve-3d;
-        }
-
-        .stick-face {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 21px;
-            backface-visibility: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 0;
-        }
-
-        /* Flat side */
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#edf3ed">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>윷 던지기 · roll-it</title>
+<style>
+:root {
+    color-scheme:light;
+    --ink:#183f3a;
+    --muted:#546e68;
+    --paper:#edf3ed;
+    --table:#18594f;
+    --table-deep:#12493f;
+    --accent:#ffc49d;
+    --line:#cbd9d1;
+    --white:#fffef7;
+}
+* {
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+body {
+    min-height:100dvh;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+    -webkit-tap-highlight-color:transparent;
+}
+button,a,summary {
+    touch-action:manipulation;
+}
+button {
+    font:inherit;
+    cursor:pointer;
+}
+button:disabled {
+    cursor:wait;
+    opacity:.55;
+}
+button,a,summary {
+    outline-offset:5px;
+}
+button:focus-visible,a:focus-visible,summary:focus-visible {
+    outline:3px solid #bb4e27;
+}
+::selection {
+    background:#ffc49d;
+    color:#183f3a;
+}
+* {
+    scrollbar-color:#73958b transparent;
+    scrollbar-width:thin;
+}
+.container {
+    width:min(1120px,100%);
+    margin:auto;
+    padding:24px 24px max(28px,env(safe-area-inset-bottom));
+}
+.site-header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:30px;
+    gap:20px;
+}
+.brand {
+    font-size:28px;
+    font-weight:850;
+    letter-spacing:-.04em;
+    text-decoration:none;
+    color:var(--ink);
+    display:flex;
+    align-items:center;
+    gap:9px;
+}
+.brand svg {
+    width:28px;
+    height:28px;
+}
+.brand-note {
+    font-size:13px;
+    color:var(--muted);
+}
+.mode-nav {
+    display:flex;
+    gap:4px;
+    padding:5px;
+    background:#dbe6df;
+    border-radius:12px;
+}
+.mode-nav a {
+    min-height:44px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0 20px;
+    border-radius:8px;
+    text-decoration:none;
+    color:#385b52;
+    font-size:14px;
+    font-weight:650;
+}
+.mode-nav .nav-active {
+    background:var(--ink);
+    color:var(--white);
+}
+.mode-nav a:hover:not(.nav-active) {
+    background:#ccdcd2;
+}
+.page-heading {
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    margin-bottom:20px;
+}
+.page-heading h1 {
+    font-size:30px;
+    letter-spacing:-.035em;
+    font-weight:800;
+}
+.page-heading p {
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.5;
+}
+.workspace {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 280px;
+    gap:32px;
+    align-items:start;
+}
+.play-panel {
+    min-width:0;
+}
+.play-field {
+    position:relative;
+    background:var(--table);
+    border-radius:16px;
+    min-height:470px;
+    overflow:hidden;
+    color:var(--white);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:32px 20px 24px;
+}
+.play-field::after {
+    content:'';
+    position:absolute;
+    inset:14px;
+    border:1px solid #508477;
+    border-radius:9px;
+    pointer-events:none;
+}
+#result-area {
+    position:relative;
+    z-index:1;
+    text-align:center;
+    min-height:128px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+}
+#result-name {
+    font-size:64px;
+    font-weight:800;
+    line-height:1.08;
+    letter-spacing:-.04em;
+    color:var(--white);
+}
+#result-name.clr-ready {
+    font-size:36px;
+}
+#result-desc {
+    color:#d1e6db;
+    font-size:15px;
+    min-height:23px;
+}
+#result-extra {
+    visibility:hidden;
+    color:#183f3a;
+    background:#ffc49d;
+    border-radius:6px;
+    padding:5px 12px;
+    font-size:13px;
+    font-weight:750;
+    min-height:27px;
+}
+#result-extra.show {
+    visibility:visible;
+}
+.clr-special,.clr-double {
+    color:#ffd0a8!important;
+}
+.history-item .clr-special,.history-item .clr-double {
+    color:#9b3e16!important;
+}
+.clr-back {
+    color:#b4d9ff!important;
+}
+.history-item .clr-back {
+    color:#285881!important;
+}
+#sticks-area,#dice-area {
+    display:flex;
+    flex:1;
+    align-items:center;
+    justify-content:center;
+    gap:23px;
+    width:100%;
+    min-height:235px;
+    padding:30px 0 24px;
+    position:relative;
+    z-index:1;
+}
+#sticks-area::after,#dice-area::after {
+    content:'';
+    position:absolute;
+    bottom:30px;
+    width:210px;
+    height:24px;
+    border-radius:50%;
+    background:#0e3b32;
+    filter:blur(12px);
+    opacity:.6;
+    z-index:-1;
+}
+.field-caption {
+    color:#d1e6db;
+    font-size:12px;
+    position:relative;
+    z-index:1;
+    line-height:1.6;
+    text-align:center;
+}
+.controls {
+    padding-top:18px;
+}
+.control-row {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:12px;
+}
+.control-label,.dice-label {
+    font-size:14px;
+    font-weight:650;
+}
+.choice-group {
+    display:flex;
+    gap:5px;
+    background:#dbe6df;
+    padding:4px;
+    border-radius:10px;
+}
+.toggle-btn,.count-btn,.sides-btn {
+    min-width:44px;
+    min-height:44px;
+    padding:8px 13px;
+    border:0;
+    border-radius:7px;
+    background:transparent;
+    color:var(--ink);
+    font-size:14px;
+    font-weight:650;
+}
+.toggle-btn.active,.count-btn.active,.sides-btn.active {
+    background:var(--ink);
+    color:var(--white);
+}
+#throw-btn,#roll-btn {
+    min-height:60px;
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    border:0;
+    border-radius:12px;
+    background:var(--accent);
+    color:#47301d;
+    font-size:19px;
+    font-weight:800;
+    box-shadow:0 5px 12px #947b6340;
+    transition:background .18s,transform .18s,box-shadow .18s;
+}
+#throw-btn:hover:not(:disabled),#roll-btn:hover:not(:disabled) {
+    background:#ffd5b8;
+}
+#throw-btn:active:not(:disabled),#roll-btn:active:not(:disabled) {
+    transform:translateY(4px);
+    box-shadow:0 2px 5px #947b632e;
+}
+.action-arrow {
+    font-size:24px;
+    font-weight:400;
+}
+.keyboard-hint {
+    text-align:center;
+    color:var(--muted);
+    font-size:12px;
+    margin:15px 0 0;
+}
+#history-section {
+    padding:4px 0;
+    min-width:0;
+}
+.history-header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--line);
+}
+.history-header h2 {
+    font-size:17px;
+    font-weight:750;
+}
+.history-header span {
+    font-size:13px;
+    font-weight:500;
+    color:var(--muted);
+    margin-left:6px;
+}
+#clear-btn {
+    min-height:44px;
+    padding:8px 0 8px 12px;
+    border:0;
+    background:transparent;
+    color:var(--muted);
+    font-size:13px;
+}
+#clear-btn:hover {
+    color:#9b3e16;
+}
+#history-list {
+    max-height:455px;
+    overflow:auto;
+}
+.history-item {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-height:62px;
+    border-bottom:1px solid var(--line);
+    font-variant-numeric:tabular-nums;
+}
+.hist-num {
+    font-size:12px;
+    color:var(--muted);
+    min-width:22px;
+}
+.hist-name {
+    font-size:19px;
+    font-weight:800;
+    min-width:40px;
+}
+.hist-desc {
+    font-size:12px;
+    color:var(--muted);
+    flex:1;
+}
+.hist-sticks {
+    display:flex;
+    gap:3px;
+}
+.mini-stick {
+    width:6px;
+    height:22px;
+    border-radius:3px;
+}
+.mini-flat {
+    background:#d6ba7e;
+}
+.mini-round {
+    background:#735331;
+}
+.history-empty {
+    padding:42px 8px;
+    text-align:center;
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.9;
+}
+.history-note {
+    font-size:12px;
+    color:var(--muted);
+    margin-top:14px;
+    line-height:1.7;
+}
+.hist-values {
+    display:flex;
+    gap:4px;
+    align-items:center;
+    flex-wrap:wrap;
+}
+.mini-die {
+    display:grid;
+    place-items:center;
+    min-width:28px;
+    height:28px;
+    background:#dbe6df;
+    border-radius:5px;
+    color:var(--ink);
+    font-weight:700;
+    font-size:14px;
+}
+.hist-plus {
+    font-size:12px;
+    color:var(--muted);
+}
+.hist-sum {
+    margin-left:auto;
+    font-weight:800;
+    font-size:18px;
+}
+.hist-kind {
+    font-size:11px;
+    color:var(--muted);
+}
+.rules {
+    border-top:1px solid var(--line);
+    margin-top:24px;
+    padding-top:5px;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.8;
+}
+.rules summary {
+    cursor:pointer;
+    min-height:44px;
+    padding:12px 0;
+    color:var(--ink);
+    font-weight:650;
+}
+.rules p {
+    padding-bottom:12px;
+}
+.result-pop {
+    animation:resultPop .35s cubic-bezier(.16,1,.3,1);
+}
+@keyframes resultPop {
+    0% {
+        transform:translateY(10px) scale(.92);
+    }
+    100% {
+        transform:translateY(0) scale(1);
+    }
+}
+@media(max-width:760px) {
+    .container {
+        padding:18px 18px max(28px,env(safe-area-inset-bottom));
+    }
+    .site-header {
+        flex-wrap:wrap;
+        gap:18px;
+        margin-bottom:25px;
+    }
+    .brand {
+        font-size:26px;
+    }
+    .brand-note {
+        font-size:12px;
+    }
+    .mode-nav {
+        order:3;
+        width:100%;
+    }
+    .mode-nav a {
+        flex:1;
+        padding:0 8px;
+    }
+    .page-heading {
+        align-items:flex-start;
+        flex-direction:column;
+        gap:5px;
+        margin-bottom:18px;
+    }
+    .page-heading h1 {
+        font-size:26px;
+    }
+    .page-heading p {
+        font-size:13px;
+    }
+    .workspace {
+        grid-template-columns:1fr;
+        gap:30px;
+    }
+    .play-field {
+        min-height:350px;
+        padding:24px 18px 20px;
+    }
+    #result-area {
+        min-height:110px;
+    }
+    #result-name {
+        font-size:56px;
+    }
+    #sticks-area,#dice-area {
+        min-height:175px;
+        gap:18px;
+        padding:24px 0 18px;
+    }
+    .controls {
+        padding-top:16px;
+    }
+    .keyboard-hint {
+        display:none;
+    }
+    #history-list {
+        max-height:280px;
+    }
+    .history-empty {
+        padding:25px 8px;
+    }
+    .history-note {
+        margin-top:8px;
+    }
+}
+@media(min-width:761px) and (max-width:950px) {
+    .workspace {
+        grid-template-columns:minmax(0,1fr) 245px;
+        gap:24px;
+    }
+    .container {
+        padding:24px;
+    }
+    .play-field {
+        min-height:480px;
+    }
+    .mode-nav a {
+        padding:0 14px;
+    }
+}
+@media(prefers-reduced-motion:reduce) {
+    *,*::before,*::after {
+        animation-duration:.001ms!important;
+        animation-delay:0ms!important;
+        transition:none!important;
+        scroll-behavior:auto!important;
+    }
+}
+.stick-wrapper {
+    perspective: 600px;
+}
+.stick-inner {
+    width: 42px;
+    height: 140px;
+    position: relative;
+    transform-style: preserve-3d;
+}
+.stick-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 21px;
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+}
+/* Flat side */
         .stick-front {
-            background: linear-gradient(180deg, #F2E6CC 0%, #E6D4A8 30%, #DECB98 50%, #E6D4A8 70%, #F2E6CC 100%);
-            border: 2px solid #C8B078;
-        }
-
-        .stick-front .line {
-            width: 50%;
-            height: 2px;
-            background: #B89E60;
-            border-radius: 1px;
-        }
-
-        .stick-front .spacer { height: 16px; }
-
-        .stick-marked .stick-front .x-mark {
-            font-size: 17px;
-            font-weight: 900;
-            color: #A02020;
-            line-height: 1;
-            margin: 6px 0;
-        }
-
-        /* Round side */
+    background: linear-gradient(180deg, #F2E6CC 0%, #E6D4A8 30%, #DECB98 50%, #E6D4A8 70%, #F2E6CC 100%);
+    border: 2px solid #C8B078;
+}
+.stick-front .line {
+    width: 50%;
+    height: 2px;
+    background: #B89E60;
+    border-radius: 1px;
+}
+.stick-front .spacer {
+    height: 16px;
+}
+.stick-marked .stick-front .x-mark {
+    font-size: 17px;
+    font-weight: 900;
+    color: #A02020;
+    line-height: 1;
+    margin: 6px 0;
+}
+/* Round side */
         .stick-back {
-            background: radial-gradient(ellipse 70% 100% at 50% 50%, #C8A048, #A07828 40%, #785818 80%, #604810 100%);
-            border: 2px solid #504010;
-            transform: rotateX(180deg);
-        }
-
-        /* Animations */
+    background: radial-gradient(ellipse 70% 100% at 50% 50%, #C8A048, #A07828 40%, #785818 80%, #604810 100%);
+    border: 2px solid #504010;
+    transform: rotateX(180deg);
+}
+/* Animations */
         @keyframes throwToFlat {
-            0%   { transform: translateY(0) rotateX(0deg); }
-            15%  { transform: translateY(-70px) rotateX(360deg); }
-            35%  { transform: translateY(-45px) rotateX(720deg); }
-            55%  { transform: translateY(-15px) rotateX(1080deg); }
-            75%  { transform: translateY(-3px) rotateX(1440deg); }
-            90%  { transform: translateY(3px) rotateX(1440deg); }
-            100% { transform: translateY(0) rotateX(1440deg); }
-        }
-
-        @keyframes throwToRound {
-            0%   { transform: translateY(0) rotateX(0deg); }
-            15%  { transform: translateY(-70px) rotateX(360deg); }
-            35%  { transform: translateY(-45px) rotateX(720deg); }
-            55%  { transform: translateY(-15px) rotateX(1080deg); }
-            75%  { transform: translateY(-3px) rotateX(1620deg); }
-            90%  { transform: translateY(3px) rotateX(1620deg); }
-            100% { transform: translateY(0) rotateX(1620deg); }
-        }
-
-        .throw-flat {
-            animation: throwToFlat var(--dur, 0.85s) cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
-
-        .throw-round {
-            animation: throwToRound var(--dur, 0.85s) cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
-
-        /* Button */
-        #throw-btn {
-            width: 100%;
-            max-width: 260px;
-            padding: 16px 32px;
-            font-size: 20px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: white;
-            background: #C41E3A;
-            border: none;
-            border-radius: 14px;
-            cursor: pointer;
-            transition: background 0.15s, transform 0.1s;
-            box-shadow: 0 4px 14px rgba(196, 30, 58, 0.25);
-        }
-
-        #throw-btn:hover:not(:disabled) { background: #D42A48; }
-
-        #throw-btn:active:not(:disabled) {
-            transform: scale(0.96);
-            background: #A8182F;
-        }
-
-        #throw-btn:disabled {
-            background: #C0B0A0;
-            box-shadow: none;
-            cursor: default;
-        }
-
-        /* History */
-        #history-section {
-            width: 100%;
-            margin-top: 36px;
-        }
-
-        .history-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .history-header h3 {
-            font-size: 15px;
-            font-weight: 600;
-            color: #8B7D6B;
-        }
-
-        #clear-btn {
-            font-size: 13px;
-            color: #B0A090;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 6px;
-        }
-
-        #clear-btn:hover { color: #C41E3A; background: rgba(196,30,58,0.06); }
-
-        #history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            max-height: 280px;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .history-item {
-            display: flex;
-            align-items: center;
-            padding: 9px 12px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        }
-
-        .hist-num {
-            font-size: 12px;
-            color: #B0A090;
-            width: 28px;
-            flex-shrink: 0;
-        }
-
-        .hist-name {
-            font-size: 17px;
-            font-weight: 700;
-            width: 50px;
-            flex-shrink: 0;
-        }
-
-        .hist-desc {
-            font-size: 12px;
-            color: #A09080;
-            flex: 1;
-        }
-
-        .hist-sticks {
-            display: flex;
-            gap: 3px;
-            margin-left: 8px;
-        }
-
-        .mini-stick {
-            width: 8px;
-            height: 24px;
-            border-radius: 4px;
-        }
-
-        .mini-flat {
-            background: #EAD8AA;
-            border: 1px solid #C8B078;
-        }
-
-        .mini-round {
-            background: #906820;
-            border: 1px solid #604810;
-        }
-
-        .history-empty {
-            text-align: center;
-            color: #C0B0A0;
-            font-size: 14px;
-            padding: 24px 0;
-        }
-    </style>
+    0% {
+        transform: translateY(0) rotateX(0deg);
+    }
+    15% {
+        transform: translateY(-70px) rotateX(360deg);
+    }
+    35% {
+        transform: translateY(-45px) rotateX(720deg);
+    }
+    55% {
+        transform: translateY(-15px) rotateX(1080deg);
+    }
+    75% {
+        transform: translateY(-3px) rotateX(1440deg);
+    }
+    90% {
+        transform: translateY(3px) rotateX(1440deg);
+    }
+    100% {
+        transform: translateY(0) rotateX(1440deg);
+    }
+}
+@keyframes throwToRound {
+    0% {
+        transform: translateY(0) rotateX(0deg);
+    }
+    15% {
+        transform: translateY(-70px) rotateX(360deg);
+    }
+    35% {
+        transform: translateY(-45px) rotateX(720deg);
+    }
+    55% {
+        transform: translateY(-15px) rotateX(1080deg);
+    }
+    75% {
+        transform: translateY(-3px) rotateX(1620deg);
+    }
+    90% {
+        transform: translateY(3px) rotateX(1620deg);
+    }
+    100% {
+        transform: translateY(0) rotateX(1620deg);
+    }
+}
+.throw-flat {
+    animation: throwToFlat var(--dur, 0.85s) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.throw-round {
+    animation: throwToRound var(--dur, 0.85s) cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.stick-inner {
+    width:44px;
+    height:145px;
+}
+.stick-front {
+    background:linear-gradient(90deg,#dcc18d,#f7e7bd 40%,#ead19d);
+    border:1px solid #b89a60;
+    box-shadow:3px 7px 9px #082f294d;
+}
+.stick-back {
+    border:1px solid #684722;
+}
+.stick-wrapper:nth-child(1) {
+    rotate:-9deg;
+}
+.stick-wrapper:nth-child(2) {
+    rotate:5deg;
+}
+.stick-wrapper:nth-child(3) {
+    rotate:-4deg;
+}
+.stick-wrapper:nth-child(4) {
+    rotate:11deg;
+}
+@media(max-width:760px) {
+    .stick-inner {
+        width:36px;
+        height:119px;
+    }
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <nav class="mode-nav">
-            <a href="index.html" class="nav-active">윷</a>
-            <a href="dice.html">주사위</a>
-            <a href="dice-3d/">3D</a>
-        </nav>
-
-        <h1>윷 던지기</h1>
-
-        <div id="result-area" aria-live="polite">
-            <div id="result-name" class="clr-ready" style="font-size:36px">준비</div>
-            <div id="result-desc">버튼을 눌러 던져보세요</div>
-            <div id="result-extra">한 번 더!</div>
-        </div>
-
-        <div id="sticks-area"></div>
-
-        <button type="button" id="throw-btn" aria-label="윷 던지기">던지기</button>
-
-        <div id="history-section">
-            <div class="history-header">
-                <h3>기록</h3>
-                <button type="button" id="clear-btn" style="visibility:hidden">초기화</button>
-            </div>
-            <div id="history-list">
-                <div class="history-empty">아직 기록이 없습니다</div>
-            </div>
-        </div>
-    </div>
-
-    <script>
+<div class="container">
+<header class="site-header">
+<a class="brand" href="index.html" aria-label="roll-it 홈">
+<svg viewBox="0 0 28 28" fill="none" aria-hidden="true">
+<rect x="3" y="3" width="22" height="22" rx="6" stroke="currentColor" stroke-width="2" transform="rotate(-8 14 14)"/>
+<circle cx="10" cy="10" r="2" fill="currentColor"/>
+<circle cx="18" cy="18" r="2" fill="currentColor"/>
+</svg>roll-it</a>
+<span class="brand-note">가볍게 던져, 함께 즐겨.</span>
+<nav class="mode-nav" aria-label="놀이 선택">
+<a href="index.html" class="nav-active" aria-current="page">윷</a>
+<a href="dice.html">주사위</a>
+<a href="dice-3d/">3D 주사위</a>
+</nav>
+</header>
+<main>
+<div class="page-heading">
+<h1>윷 던지기</h1>
+<p>네 개의 윷가락, 오늘의 한 수.</p>
+</div>
+<div class="workspace">
+<section class="play-panel" aria-label="윷 던지기">
+<div class="play-field">
+<div id="result-area" aria-live="polite" aria-atomic="true">
+<div id="result-name" class="clr-ready">준비됐나요?</div>
+<div id="result-desc">버튼을 눌러 행운을 던져보세요</div>
+<div id="result-extra">한 번 더 던져요!</div>
+</div>
+<div id="sticks-area" aria-hidden="true">
+</div>
+<p class="field-caption">표시된 윷가락 하나만 뒤집히면 빽도</p>
+</div>
+<div class="controls">
+<button type="button" id="throw-btn">윷 던지기 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+<path d="M5 19 19 5M5 5h14v14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</button>
+</div>
+<p class="keyboard-hint">Space 또는 Enter 키로도 던질 수 있어요</p>
+<details class="rules">
+<summary>윷놀이 결과 읽는 법</summary>
+<p>도 1칸 · 개 2칸 · 걸 3칸 · 윷 4칸 · 모 5칸.<br>윷과 모는 한 번 더 던져요. X가 표시된 윷가락만 평평한 면이면 빽도, 한 칸 뒤로 가요.</p>
+</details>
+</section>
+<aside id="history-section" aria-label="최근 던지기 기록">
+<div class="history-header">
+<h2>최근 기록 <span id="history-count">0회</span>
+</h2>
+<button type="button" id="clear-btn" style="visibility:hidden">기록 지우기</button>
+</div>
+<div id="history-list">
+<div class="history-empty">첫 번째 행운을 기다리는 중.<br>한 번 던져볼까요?</div>
+</div>
+<p class="history-note">최근 30회 · 이 탭에서 모드를 바꿔도 유지돼요.</p>
+<p id="storage-note" class="history-note" role="status">
+</p>
+</aside>
+</div>
+</main>
+</div><script>
         const FLAT_PROB = 0.4;
-        const ANIM_MS = 850;
+        const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+        const ANIM_MS = 950;
         const STAGGER_MS = 60;
 
         let throwCount = 0;
         let busy = false;
         const hist = [];
+        const STORAGE_KEY = 'roll-it:yut:v1';
 
         const $ = function(id) { return document.getElementById(id); };
         const sticksArea = $('sticks-area');
@@ -420,6 +797,10 @@
             var sticks = Array.from({ length: 4 }, function() {
                 return Math.random() < FLAT_PROB;
             });
+            return { sticks: sticks, result: resultForSticks(sticks) };
+        }
+
+        function resultForSticks(sticks) {
             var flat = sticks.filter(Boolean).length;
 
             var table = {
@@ -430,21 +811,21 @@
             };
 
             if (flat === 1) {
-                return {
-                    sticks: sticks,
-                    result: sticks[0]
+                return sticks[0]
                         ? { name: '빽도', desc: '1칸 후퇴', extra: false, type: 'back' }
-                        : { name: '도', desc: '1칸 이동', extra: false, type: 'normal' },
-                };
+                        : { name: '도', desc: '1칸 이동', extra: false, type: 'normal' };
             }
 
-            return { sticks: sticks, result: table[flat] };
+            return table[flat];
         }
 
         function doThrow() {
             if (busy) return;
             busy = true;
             throwBtn.disabled = true;
+            throwBtn.textContent = '던지는 중…';
+            clearBtn.disabled = true;
+            $('result-area').setAttribute('aria-busy', 'true');
 
             var data = roll();
             var sticks = data.sticks;
@@ -464,20 +845,20 @@
                 void e.offsetHeight;
             });
 
-            resultName.textContent = '';
+            resultName.textContent = '두근두근';
             resultName.className = '';
             resultDesc.textContent = '';
             resultExtra.classList.remove('show');
 
             requestAnimationFrame(function() {
                 inners.forEach(function(e, i) {
-                    e.style.setProperty('--dur', (800 + Math.random() * 150) + 'ms');
+                    e.style.setProperty('--dur', (reducedMotion.matches ? 1 : 800 + Math.random() * 150) + 'ms');
                     setTimeout(function() {
                         e.classList.add(sticks[i] ? 'throw-flat' : 'throw-round');
-                    }, i * STAGGER_MS);
+                    }, reducedMotion.matches ? 0 : i * STAGGER_MS);
                 });
 
-                var finishAt = ANIM_MS + 3 * STAGGER_MS + 50;
+                var finishAt = reducedMotion.matches ? 30 : ANIM_MS + 3 * STAGGER_MS + 50;
 
                 setTimeout(function() {
                     wrappers.forEach(function(w) {
@@ -490,7 +871,6 @@
 
                     var colors = { special: 'clr-special', back: 'clr-back', normal: 'clr-normal' };
                     resultName.textContent = result.name;
-                    resultName.style.fontSize = '64px';
                     resultName.className = colors[result.type] + ' result-pop';
                     resultDesc.textContent = result.desc;
 
@@ -504,20 +884,26 @@
 
                     busy = false;
                     throwBtn.disabled = false;
+                    throwBtn.textContent = '다시 던지기';
+                    clearBtn.disabled = false;
+                    $('result-area').setAttribute('aria-busy', 'false');
                 }, finishAt);
             });
         }
 
         function pushHistory(sticks, result) {
             hist.unshift({ sticks: sticks, result: result, num: throwCount });
+            hist.splice(30);
+            saveHistory();
             renderHistory();
         }
 
         function renderHistory() {
             historyList.textContent = '';
+            $('history-count').textContent = hist.length + '회';
 
             if (!hist.length) {
-                historyList.appendChild(el('div', 'history-empty', '아직 기록이 없습니다'));
+                historyList.appendChild(el('div', 'history-empty', '첫 번째 행운을 기다리는 중. 한 번 던져볼까요?'));
                 clearBtn.style.visibility = 'hidden';
                 return;
             }
@@ -549,6 +935,7 @@
         function clearAll() {
             hist.length = 0;
             throwCount = 0;
+            saveHistory();
             renderHistory();
         }
 
@@ -562,7 +949,24 @@
             }
         });
 
+
+        function saveHistory() {
+            try { sessionStorage.setItem(STORAGE_KEY, JSON.stringify(hist)); }
+            catch { $('storage-note').textContent = '이 브라우저에서는 이동 후 기록을 유지할 수 없어요.'; }
+        }
+        function readHistory() {
+            try {
+                const saved = JSON.parse(sessionStorage.getItem(STORAGE_KEY) || '[]');
+                return Array.isArray(saved) ? saved.slice(0, 30) : [];
+            } catch { return []; }
+        }
+
+        for (const h of readHistory()) {
+            if (h && Array.isArray(h.sticks) && h.sticks.length === 4 && h.sticks.every(v => typeof v === 'boolean') && Number.isSafeInteger(h.num) && h.num > 0) {
+                hist.push({sticks:h.sticks, result:resultForSticks(h.sticks), num:h.num});
+            }
+        }
+        throwCount = Math.max(0, ...hist.map(h => h.num));
+        renderHistory();
         initSticks();
-    </script>
-</body>
-</html>
+    </script></body></html>

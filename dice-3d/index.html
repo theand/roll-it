@@ -1,48 +1,100 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>3D 주사위</title>
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#edf3ed">
+<title>3D 주사위 · roll-it</title>
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <nav class="mode-nav">
-    <a href="../index.html">윷</a>
-    <a href="../dice.html">주사위</a>
-    <a href="./" class="nav-active">3D</a>
-  </nav>
-
-  <div id="title">COSMIC DICE</div>
-  <canvas id="dice-canvas"></canvas>
-  <div id="controls">
-    <div id="dice-count">
-      <span class="dice-label">DICE</span>
-      <button type="button" data-count="1" class="count-btn active">1</button>
-      <button type="button" data-count="2" class="count-btn">2</button>
-      <button type="button" data-count="3" class="count-btn">3</button>
-      <button type="button" data-count="4" class="count-btn">4</button>
-    </div>
-    <div id="dice-sides">
-      <span class="dice-label">SIDES</span>
-      <button type="button" data-sides="6" class="sides-btn">D6</button>
-      <button type="button" data-sides="8" class="sides-btn">D8</button>
-      <button type="button" data-sides="12" class="sides-btn">D12</button>
-      <button type="button" data-sides="20" class="sides-btn active">D20</button>
-    </div>
-    <button type="button" id="roll-btn">ROLL</button>
-  </div>
-  <div id="webgl-error" hidden>
-    <p>WebGL을 지원하지 않는 브라우저입니다.</p>
-  </div>
-
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js"
-    }
-  }
-  </script>
-  <script type="module" src="js/main.js"></script>
+<div class="container">
+<header class="site-header">
+<a class="brand" href="../index.html" aria-label="roll-it 홈">
+<svg viewBox="0 0 28 28" fill="none" aria-hidden="true">
+<rect x="3" y="3" width="22" height="22" rx="6" stroke="currentColor" stroke-width="2" transform="rotate(-8 14 14)"/>
+<circle cx="10" cy="10" r="2" fill="currentColor"/>
+<circle cx="18" cy="18" r="2" fill="currentColor"/>
+</svg>roll-it</a>
+<span class="brand-note">가볍게 던져, 함께 즐겨.</span>
+<nav class="mode-nav" aria-label="놀이 선택">
+<a href="../index.html">윷</a>
+<a href="../dice.html">주사위</a>
+<a href="./" class="nav-active" aria-current="page">3D 주사위</a>
+</nav>
+</header>
+<main>
+<div class="page-heading">
+<h1>3D 주사위</h1>
+<p>구르고, 부딪히고, 멈추는 순간까지.</p>
+</div>
+<div class="workspace">
+<section class="play-panel" aria-label="3D 주사위 던지기">
+<div class="play-field">
+<div id="result-area" aria-live="polite" aria-atomic="true">
+<div id="result-name" class="clr-ready">준비하는 중</div>
+<div id="result-desc">주사위를 불러오고 있어요</div>
+<div id="result-extra">
+</div>
+</div>
+<div id="canvas-stage">
+<canvas id="dice-canvas" aria-label="3D 주사위 놀이 공간">
+</canvas>
+<div id="webgl-error" role="alert" hidden>
+<p>3D 화면을 불러오지 못했어요.<br>연결을 확인하고 새로고침해 주세요.</p>
+<a href="../dice.html">2D 주사위로 놀기</a>
+</div>
+</div>
+<p class="field-caption">D6부터 D20까지 · 나만의 주사위 조합</p>
+</div>
+<div class="controls" id="controls">
+<div class="control-row">
+<span class="dice-label" id="sides-label">면 수</span>
+<div class="choice-group" id="dice-sides" role="group" aria-labelledby="sides-label">
+<button type="button" data-sides="6" class="sides-btn" aria-pressed="false">D6</button>
+<button type="button" data-sides="8" class="sides-btn" aria-pressed="false">D8</button>
+<button type="button" data-sides="12" class="sides-btn" aria-pressed="false">D12</button>
+<button type="button" data-sides="20" class="sides-btn active" aria-pressed="true">D20</button>
+</div>
+</div>
+<div class="control-row">
+<span class="dice-label" id="count-label">주사위 개수</span>
+<div class="choice-group" id="dice-count" role="group" aria-labelledby="count-label">
+<button type="button" data-count="1" class="count-btn active" aria-pressed="true">1개</button>
+<button type="button" data-count="2" class="count-btn" aria-pressed="false">2개</button>
+<button type="button" data-count="3" class="count-btn" aria-pressed="false">3개</button>
+<button type="button" data-count="4" class="count-btn" aria-pressed="false">4개</button>
+</div>
+</div>
+<button type="button" id="roll-btn" disabled>불러오는 중…</button>
+</div>
+<p class="keyboard-hint">Space 또는 Enter 키로도 던질 수 있어요</p>
+</section>
+<aside id="history-section" aria-label="최근 던지기 기록">
+<div class="history-header">
+<h2>최근 기록 <span id="history-count">0회</span>
+</h2>
+<button type="button" id="clear-btn" style="visibility:hidden">기록 지우기</button>
+</div>
+<div id="history-list">
+<div class="history-empty">첫 번째 행운을 기다리는 중.<br>한 번 던져볼까요?</div>
+</div>
+<p class="history-note">최근 30회 · 이 탭에서 모드를 바꿔도 유지돼요.</p>
+<p id="storage-note" class="history-note" role="status">
+</p>
+</aside>
+</div>
+</main>
+</div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js"}}</script>
+<script type="module">
+  import('./js/main.js').catch(() => {
+    document.getElementById('webgl-error').hidden = false;
+    document.getElementById('result-name').textContent = '연결을 확인해 주세요';
+    document.getElementById('result-desc').textContent = '아래에서 2D 주사위로 전환할 수 있어요';
+    document.getElementById('roll-btn').textContent = '3D 사용 불가';
+    document.querySelectorAll('#controls button').forEach(button => button.disabled = true);
+  });
+</script>
 </body>
 </html>
