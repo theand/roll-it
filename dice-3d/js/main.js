@@ -61,7 +61,7 @@ function renderHistory() {
   $('history-count').textContent = history.length + '회';
   $('clear-btn').style.visibility = history.length ? 'visible' : 'hidden';
   if (!history.length) {
-    $('history-list').append(element('div', 'history-empty', '첫 번째 행운을 기다리는 중. 한 번 던져볼까요?'));
+    $('history-list').append(element('div', 'history-empty', '아직 기록이 없어요'));
   }
   for (const h of history) {
     const row = element('div', 'history-item', '');
@@ -166,6 +166,8 @@ document.addEventListener('keydown', event => {
 canvas.addEventListener('webglcontextlost', event => {
   event.preventDefault();
   contextLost = true;
+  $('result-name').textContent = '';
+  $('result-desc').textContent = '';
   rollBtn.disabled = true;
   rollBtn.textContent = '새로고침이 필요해요';
   selectors.forEach(btn => btn.disabled = true);

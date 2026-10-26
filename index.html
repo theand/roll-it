@@ -700,14 +700,13 @@ button:focus-visible,a:focus-visible,summary:focus-visible {
 <main>
 <div class="page-heading">
 <h1>윷 던지기</h1>
-<p>네 개의 윷가락, 오늘의 한 수.</p>
 </div>
 <div class="workspace">
 <section class="play-panel" aria-label="윷 던지기">
 <div class="play-field">
 <div id="result-area" aria-live="polite" aria-atomic="true">
 <div id="result-name" class="clr-ready">준비됐나요?</div>
-<div id="result-desc">버튼을 눌러 행운을 던져보세요</div>
+<div id="result-desc"></div>
 <div id="result-extra">한 번 더 던져요!</div>
 </div>
 <div id="sticks-area" aria-hidden="true">
@@ -733,7 +732,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible {
 <button type="button" id="clear-btn" style="visibility:hidden">기록 지우기</button>
 </div>
 <div id="history-list">
-<div class="history-empty">첫 번째 행운을 기다리는 중.<br>한 번 던져볼까요?</div>
+<div class="history-empty">아직 기록이 없어요</div>
 </div>
 <p class="history-note">최근 30회 · 이 탭에서 모드를 바꿔도 유지돼요.</p>
 <p id="storage-note" class="history-note" role="status">
@@ -903,7 +902,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible {
             $('history-count').textContent = hist.length + '회';
 
             if (!hist.length) {
-                historyList.appendChild(el('div', 'history-empty', '첫 번째 행운을 기다리는 중. 한 번 던져볼까요?'));
+                historyList.appendChild(el('div', 'history-empty', '아직 기록이 없어요'));
                 clearBtn.style.visibility = 'hidden';
                 return;
             }
